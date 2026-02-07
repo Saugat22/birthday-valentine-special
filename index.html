@@ -1,0 +1,309 @@
+<!--
+RUN locally:
+  python -m http.server 5500
+  then open http://localhost:5500
+
+Replace files here:
+  assets/bg.jpg
+  assets/montage.mp4
+
+Placeholders are used until files are replaced.
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>For maichang</title>
+    <link rel="stylesheet" href="styles.css?v=2" />
+  </head>
+  <body>
+    <div class="bg"></div>
+    <div class="floating-layer" aria-hidden="true"></div>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <main class="stage">
+      <section id="screen-intro" class="screen active intro-screen" aria-label="Intro">
+        <img
+          class="intro-sequence"
+          id="intro-sequence"
+          src="Untitled/footage/Untitled_000.jpeg"
+          alt=""
+          aria-hidden="true"
+        />
+        <div class="intro-inner">
+          <p class="intro-text" id="intro-text">
+            <span class="intro-line" style="--d: 0.8s; --dur: 3.2s;">
+              Even from far away...
+            </span>
+            <span class="intro-line" style="--d: 4.2s; --dur: 3.2s;">
+              I wanted to give you something special.
+            </span>
+            <span class="intro-line" style="--d: 7.8s; --dur: 3.4s;">
+              So I made this little surprise with my time, my heart, and my skills.
+            </span>
+            <span class="intro-line" style="--d: 11.6s; --dur: 3.4s;">
+              I hope it makes you smile as much as you make me smile.
+            </span>
+          </p>
+          <div class="intro-actions">
+            <button class="btn" id="intro-toggle">Pause Intro</button>
+            <button class="btn primary intro-btn" id="continue-btn">Continue</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="screen-question" class="screen hidden question-screen">
+        <img
+          class="question-bg"
+          src="assets/giphy1.gif"
+          alt=""
+          aria-hidden="true"
+        />
+        <div class="panel">
+          <h2>One question for you</h2>
+          <p>Are you ready for something special?</p>
+          <button class="btn primary" id="question-btn">Continue</button>
+        </div>
+      </section>
+
+      <section id="screen-plant" class="screen hidden">
+        <div class="video-full">
+          <video
+            id="plant-video"
+            src="Background/susprise%20plant.mp4"
+            autoplay
+            playsinline
+            preload="auto"
+          ></video>
+        </div>
+      </section>
+
+      <section id="hero" class="screen hidden hero video-only">
+        <video
+          class="hero-bg"
+          id="heroBg"
+          src="Background/hero%20background.mp4"
+          autoplay
+          playsinline
+          preload="auto"
+        ></video>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+          <div class="hero-media">
+            <video
+              id="hero-preview"
+              src="assets/montage.mp4"
+              muted
+              loop
+              playsinline
+              preload="metadata"
+            ></video>
+            <div class="hero-media-overlay">Tap to play</div>
+            <div class="hero-media-glow"></div>
+          </div>
+          <div class="hero-text">
+            <div class="hero-kicker">For my favorite person</div>
+            <h1 class="hero-title">HAPPY BIRTHDAY, MAICHANG</h1>
+          </div>
+          <button class="btn primary hero-btn" id="surprise-btn">
+            Start the Game
+          </button>
+        </div>
+      </section>
+
+      <section id="screen-note" class="screen hidden">
+        <div class="panel">
+          <h2>Now plant the surprise</h2>
+          <p>Click the button to start the video.</p>
+          <button class="btn primary" id="plant-btn">Plant the Surprise</button>
+        </div>
+      </section>
+
+      <section id="screen-game" class="screen hidden">
+        <div class="panel wide">
+          <h2>Catch the Hearts 💖</h2>
+          <p>Catch 7 hearts within 20 seconds.</p>
+          <div class="game-ui">
+            <div>Score: <span id="score">0</span>/7</div>
+            <div>Time: <span id="time">20</span>s</div>
+          </div>
+          <div class="game-area" id="game-area" aria-label="Game area"></div>
+          <p class="game-message" id="game-message"></p>
+          <button class="btn primary" id="start-game">Play</button>
+        </div>
+      </section>
+
+      <section id="screen-game2" class="screen hidden">
+        <div class="panel wide">
+          <h2>Star Tap Challenge ✨</h2>
+          <p>Tap 10 stars within 18 seconds.</p>
+          <div class="game-ui">
+            <div>Score: <span id="score2">0</span>/10</div>
+            <div>Time: <span id="time2">18</span>s</div>
+          </div>
+          <div class="game-area" id="game2-area" aria-label="Game area"></div>
+          <p class="game-message" id="game-message2"></p>
+          <button class="btn primary" id="start-game2">Play</button>
+        </div>
+      </section>
+
+      <section id="screen-valentine" class="screen hidden valentine-screen">
+        <img
+          class="valentine-bg"
+          src="assets/giphy%202.gif"
+          alt=""
+          aria-hidden="true"
+        />
+        <div class="panel">
+          <h2>Will you be my Valentine?</h2>
+          <div class="valentine-area" id="valentine-area">
+            <button class="btn primary" id="yes-btn">YES 💘</button>
+            <button class="btn" id="no-btn">NO 🙈</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="screen-celebration" class="screen hidden celebration-screen">
+        <div class="panel celebration-panel">
+          <h2>🎉 YAYYY!</h2>
+          <p class="subtitle">Signal confirmed</p>
+          <p>Love protocol engaged 💖</p>
+          <button class="btn primary" id="celebration-btn">Start My Mission</button>
+        </div>
+      </section>
+
+      <section id="screen-brief" class="screen hidden brief-screen">
+        <div class="panel wide brief-panel">
+          <div class="badge">CONFIDENTIAL</div>
+          <div class="mail-banner">
+            <span>📩 NEW MESSAGE RECEIVED</span>
+          </div>
+          <h2>💌 Mission Brief</h2>
+          <p class="subtitle">OPERATION: LOVE COUNTDOWN ⏳</p>
+          <p
+            class="brief-body"
+            id="brief-body"
+            data-full="A top-secret, high-security countdown device is standing by. The sequence is locked. Complete the mission tasks to authorize activation and uncover what this moment was always meant to reveal."
+          ></p>
+          <button class="btn primary" id="brief-btn">View My Tasks</button>
+        </div>
+      </section>
+
+      <section id="screen-message" class="screen hidden message-screen">
+        <div class="panel wide message-panel">
+          <h2>Incoming Message</h2>
+          <p class="message-text" id="message-text"></p>
+          <button class="btn primary" id="message-next-btn" disabled>
+            Proceed to Tasks →
+          </button>
+        </div>
+      </section>
+
+      <section id="screen-decrypt" class="screen hidden decrypt-screen">
+        <div class="panel">
+          <h2>Decrypting mission…</h2>
+          <div class="progress">
+            <span class="progress-bar" id="decrypt-bar"></span>
+          </div>
+          <p class="progress-text" id="decrypt-text">0%</p>
+        </div>
+      </section>
+
+      <section id="screen-tasks" class="screen hidden tasks-screen">
+        <div class="panel wide tasks-panel">
+          <h2>Mission Tasks</h2>
+          <div class="task-list">
+            <div class="task-item">
+              <div class="task-title">Task 1: System Check</div>
+              <button class="btn" id="task1-btn">All good 💖</button>
+            </div>
+            <div class="task-item hidden" id="task2-item">
+              <div class="task-title">Task 2: Timer Sync</div>
+              <button class="btn" id="task2-btn" disabled>Timer Sync 🔒</button>
+            </div>
+            <div class="task-item hidden" id="task3-item">
+              <div class="task-title">Task 3: Final Step</div>
+              <button class="btn primary" id="task3-btn" disabled>Start Countdown 🔒</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="screen-video1" class="screen hidden video-screen">
+        <div class="video-full">
+          <video
+            id="video1"
+            src="Background/susprise%20plant.mp4"
+            playsinline
+            preload="auto"
+          ></video>
+          <div
+            class="video-quote bottom"
+            id="video1-quote"
+            data-text="⏳ Not every timer ends with noise…"
+          ></div>
+        </div>
+      </section>
+
+      <section id="screen-video2" class="screen hidden video-screen">
+        <div class="video-full">
+          <video
+            id="video2"
+            src="Background/hero%20background.mp4"
+            playsinline
+            preload="auto"
+          ></video>
+          <div
+            class="video-quote bottom"
+            id="video2-quote"
+            data-text="💖Countdown complete.|This is what it was hiding…"
+          ></div>
+        </div>
+      </section>
+
+      <section id="screen-end" class="screen hidden end-screen">
+        <div class="panel wide">
+          <h2>🎂💌 Valentine & Birthday Month Surprise</h2>
+          <p>Perfect timing — because you’re worth waiting for.</p>
+          <button class="btn primary" id="replay-btn">Replay Surprise</button>
+        </div>
+      </section>
+
+      <section id="screen-hooray" class="screen hidden">
+        <div class="confetti-layer" id="confetti-layer" aria-hidden="true"></div>
+        <div class="panel">
+          <h2>Huraay! 💖</h2>
+          <p>You made me the happiest.</p>
+        </div>
+      </section>
+
+      <section id="screen-video" class="screen hidden">
+        <div class="video-full">
+          <video
+            id="montage"
+            src="assets/montage.mp4"
+            playsinline
+            preload="metadata"
+          ></video>
+          <div class="video-overlay" id="video-overlay">Tap to play</div>
+          <div class="video-fallback" id="video-fallback" hidden>
+            <strong>Replace montage.mp4</strong>
+            <p>Full screen video will play here.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="screen-finish" class="screen hidden">
+        <div class="panel">
+          <h2>Finished 💗</h2>
+          <p>I hope this made you smile. I’m always yours. ❤️</p>
+          <p class="final-words">ऐला भिबा दौँतारी ङा मुला</p>
+          <button class="btn primary" id="restart-btn">Back to Start</button>
+        </div>
+      </section>
+    </main>
+
+    <script src="app.js?v=2"></script>
+  </body>
+</html>
