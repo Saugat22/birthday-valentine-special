@@ -350,14 +350,28 @@ const moveNoButton = (x, y) => {
   }
 
   if (yesRect) {
-    const yesX = yesRect.left - area.left + yesRect.width / 2;
-    const yesY = yesRect.top - area.top + yesRect.height / 2;
-    const noX = nx + btn.width / 2;
-    const noY = ny + btn.height / 2;
-    const yesDistance = Math.hypot(noX - yesX, noY - yesY);
-    if (yesDistance < 140) {
-      nx = (nx + 200) % maxX;
-      ny = (ny + 140) % maxY;
+    const yesBox = {
+      left: yesRect.left - area.left - 20,
+      top: yesRect.top - area.top - 20,
+      right: yesRect.left - area.left + yesRect.width + 20,
+      bottom: yesRect.top - area.top + yesRect.height + 20
+    };
+    // retry a few times to avoid overlapping YES
+    let tries = 0;
+    while (tries < 8) {
+      const noLeft = nx;
+      const noTop = ny;
+      const noRight = nx + btn.width;
+      const noBottom = ny + btn.height;
+      const overlap =
+        noLeft < yesBox.right &&
+        noRight > yesBox.left &&
+        noTop < yesBox.bottom &&
+        noBottom > yesBox.top;
+      if (!overlap) break;
+      nx = Math.random() * maxX;
+      ny = Math.random() * maxY;
+      tries += 1;
     }
   }
 
