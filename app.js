@@ -5,11 +5,12 @@ const hero = document.getElementById("hero");
 const heroBg = document.getElementById("heroBg");
 const heroPreview = document.getElementById("hero-preview");
 const heroPreviewOverlay = document.querySelector(".hero-media-overlay");
-const introSequence = document.getElementById("intro-sequence");
+const introVideo = document.getElementById("intro-video");
 const introLines = Array.from(
   document.querySelectorAll("#intro-text .intro-line")
 );
 const introToggle = document.getElementById("intro-toggle");
+const introReplay = document.getElementById("intro-replay");
 
 const screens = {
   intro: document.getElementById("screen-intro"),
@@ -85,8 +86,9 @@ let heroRaf = null;
 let lastNoMove = 0;
 let introTimer = null;
 let introTextTimer = null;
-let introFrameIndex = 0;
 let introPaused = false;
+let introTextRemaining = 15800;
+let introTextStart = 0;
 let game2Timer = null;
 let spawnTimer2 = null;
 let timeLeft2 = 18;
@@ -330,6 +332,7 @@ const moveNoButton = (x, y) => {
   if (!valentineArea || !noBtn) return;
   const area = valentineArea.getBoundingClientRect();
   const btn = noBtn.getBoundingClientRect();
+  const yesRect = yesBtn ? yesBtn.getBoundingClientRect() : null;
   const maxX = Math.max(area.width - btn.width, 0);
   const maxY = Math.max(area.height - btn.height, 0);
 
@@ -340,9 +343,21 @@ const moveNoButton = (x, y) => {
     const dx = x - area.left;
     const dy = y - area.top;
     const distance = Math.hypot(dx - nx, dy - ny);
-    if (distance < 100) {
-      nx = (nx + 120) % maxX;
-      ny = (ny + 80) % maxY;
+    if (distance < 140) {
+      nx = (nx + 180) % maxX;
+      ny = (ny + 120) % maxY;
+    }
+  }
+
+  if (yesRect) {
+    const yesX = yesRect.left - area.left + yesRect.width / 2;
+    const yesY = yesRect.top - area.top + yesRect.height / 2;
+    const noX = nx + btn.width / 2;
+    const noY = ny + btn.height / 2;
+    const yesDistance = Math.hypot(noX - yesX, noY - yesY);
+    if (yesDistance < 140) {
+      nx = (nx + 200) % maxX;
+      ny = (ny + 140) % maxY;
     }
   }
 
@@ -396,44 +411,21 @@ const resetIntroText = () => {
   }
 };
 
-const INTRO_FRAME_START = 0;
-const INTRO_FRAME_END = 270;
-const INTRO_FPS = 18;
-const INTRO_PATH = "./Untitled/footage/Untitled_";
-
-const introFramePath = (index) =>
-  `${INTRO_PATH}${String(index).padStart(3, "0")}.jpeg`;
-
-const preloadIntroFrames = (count = 12) => {
-  for (let i = 0; i < count; i += 1) {
-    const img = new Image();
-    img.src = introFramePath(INTRO_FRAME_START + i);
-  }
-};
-
 const playIntroSequence = () => {
-  if (!introSequence) return 0;
-  const totalFrames = INTRO_FRAME_END - INTRO_FRAME_START + 1;
-  const duration = (totalFrames / INTRO_FPS) * 1000;
-  introFrameIndex = INTRO_FRAME_START;
-  introSequence.src = introFramePath(introFrameIndex);
+  if (!introVideo) return 0;
   if (introTimer) {
     clearInterval(introTimer);
   }
-
   introTimer = setInterval(() => {
     if (introPaused) return;
-    introFrameIndex += 1;
-    if (introFrameIndex > INTRO_FRAME_END) {
-      clearInterval(introTimer);
-      introTimer = null;
-      updateIntroText(1);
-      return;
+    if (introVideo.paused && !introVideo.ended) {
+      introVideo.play().catch(() => {});
     }
-    introSequence.src = introFramePath(introFrameIndex);
-  }, 1000 / INTRO_FPS);
-
-  return duration;
+  }, 500);
+  introVideo.currentTime = 0;
+  introVideo.playbackRate = 0.75;
+  introVideo.play().catch(() => {});
+  return introVideo.duration ? introVideo.duration * 1000 : 0;
 };
 
 
@@ -458,28 +450,22 @@ const startIntroCinematic = () => {
     clearTimeout(introTextTimer);
     introTextTimer = null;
   }
-  preloadIntroFrames();
-  const firstFrame = new Image();
-  firstFrame.onload = () => {
-    playIntroSequence();
-  };
-  firstFrame.onerror = () => {
-    showToast("Intro images not found");
-  };
-  firstFrame.src = introFramePath(INTRO_FRAME_START);
+  playIntroSequence();
   introLines.forEach((line) => {
     line.classList.remove("animate");
     void line.offsetWidth;
     line.classList.add("animate");
   });
   if (continueBtn) {
+    introTextRemaining = 15800;
+    introTextStart = Date.now();
     introTextTimer = setTimeout(() => {
       continueBtn.classList.add("show");
       continueBtn.disabled = false;
       if (introToggle) {
         introToggle.classList.add("hidden");
       }
-    }, 15800);
+    }, introTextRemaining);
   }
 };
 
@@ -580,13 +566,37 @@ const startMessageType = () => {
 };
 
 const toggleIntroPlayback = () => {
-  if (!introSequence || !introTimer) return;
+  if (!introVideo || !introTimer) return;
   introPaused = !introPaused;
   if (screens.intro) {
     screens.intro.classList.toggle("intro-paused", introPaused);
   }
   if (introToggle) {
     introToggle.textContent = introPaused ? "Resume Intro" : "Pause Intro";
+  }
+  if (introVideo) {
+    if (introPaused) {
+      introVideo.pause();
+    } else {
+      introVideo.play().catch(() => {});
+    }
+  }
+  if (continueBtn) {
+    if (introPaused) {
+      if (introTextTimer) {
+        clearTimeout(introTextTimer);
+      }
+      introTextRemaining -= Date.now() - introTextStart;
+    } else {
+      introTextStart = Date.now();
+      introTextTimer = setTimeout(() => {
+        continueBtn.classList.add("show");
+        continueBtn.disabled = false;
+        if (introToggle) {
+          introToggle.classList.add("hidden");
+        }
+      }, Math.max(introTextRemaining, 0));
+    }
   }
 };
 continueBtn.addEventListener("click", () => {
@@ -654,6 +664,21 @@ if (messageNextBtn) {
 
 if (introToggle) {
   introToggle.addEventListener("click", toggleIntroPlayback);
+}
+
+if (introReplay) {
+  introReplay.addEventListener("click", () => {
+    startIntroCinematic();
+  });
+}
+
+if (introVideo) {
+  introVideo.addEventListener("ended", () => {
+    if (introTimer) {
+      clearInterval(introTimer);
+      introTimer = null;
+    }
+  });
 }
 
 
@@ -741,6 +766,16 @@ if (valentineArea) {
 
   valentineArea.addEventListener("touchmove", () => {
     moveNoButton();
+  });
+}
+
+if (noBtn) {
+  noBtn.addEventListener("mouseenter", (e) => {
+    moveNoButton(e.clientX, e.clientY);
+  });
+  noBtn.addEventListener("touchstart", (e) => {
+    const touch = e.touches && e.touches[0];
+    moveNoButton(touch ? touch.clientX : undefined, touch ? touch.clientY : undefined);
   });
 }
 

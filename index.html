@@ -24,13 +24,15 @@ Placeholders are used until files are replaced.
 
     <main class="stage">
       <section id="screen-intro" class="screen active intro-screen" aria-label="Intro">
-        <img
+        <video
           class="intro-sequence"
-          id="intro-sequence"
-          src="Untitled/footage/Untitled_000.jpeg"
-          alt=""
+          id="intro-video"
+          src="assets/intro.mp4"
+          muted
+          playsinline
+          preload="auto"
           aria-hidden="true"
-        />
+        ></video>
         <div class="intro-inner">
           <p class="intro-text" id="intro-text">
             <span class="intro-line" style="--d: 0.8s; --dur: 3.2s;">
@@ -48,6 +50,7 @@ Placeholders are used until files are replaced.
           </p>
           <div class="intro-actions">
             <button class="btn" id="intro-toggle">Pause Intro</button>
+            <button class="btn" id="intro-replay">Replay Intro</button>
             <button class="btn primary intro-btn" id="continue-btn">Continue</button>
           </div>
         </div>
